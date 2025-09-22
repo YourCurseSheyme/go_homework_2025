@@ -15,7 +15,11 @@ type Library struct {
 }
 
 func NewLibrary(data storages.Storage, idGen generators.IDGenerator) *Library {
-	return &Library{Data: data, Titles: make(map[string][]int), IDGen: idGen}
+	return &Library{
+		Data:   data,
+		Titles: make(map[string][]int),
+		IDGen:  idGen,
+	}
 }
 
 func (l *Library) ReplaceIDGen(newGen generators.IDGenerator) {
@@ -35,10 +39,15 @@ func (l *Library) Add(title, author string, year int) (book.Book, bool) {
 		return book.Book{}, false
 	}
 	id := l.IDGen()
-	book := book.Book{ID: id, Title: title, Author: author, Year: year}
-	l.Data.AddBook(book)
+	item := book.Book{
+		ID:     id,
+		Title:  title,
+		Author: author,
+		Year:   year,
+	}
+	l.Data.AddBook(item)
 	l.Titles[title] = append(l.Titles[title], id)
-	return book, true
+	return item, true
 }
 
 func (l *Library) FindByTitle(title string) []book.Book {
@@ -51,8 +60,8 @@ func (l *Library) FindByTitle(title string) []book.Book {
 	}
 	books := make([]book.Book, 0, len(ids))
 	for _, id := range ids {
-		if book, ok := l.Data.GetByID(id); ok {
-			books = append(books, book)
+		if item, ok := l.Data.GetByID(id); ok {
+			books = append(books, item)
 		}
 	}
 	return books
