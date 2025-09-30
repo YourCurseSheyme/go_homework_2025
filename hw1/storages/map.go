@@ -14,7 +14,18 @@ func (s *MapStorage) AddBook(book book.Book) {
 	s.Data[book.ID] = book
 }
 
-func (s *MapStorage) GetByID(id int) (book.Book, bool) {
+func (s *MapStorage) GetByID(id int) (book.Book, error) {
 	item, ok := s.Data[id]
-	return item, ok
+	if !ok {
+		return item, ErrorBookNotFound
+	}
+	return item, nil
+}
+
+func (s *MapStorage) RemoveByID(id int) error {
+	if _, ok := s.Data[id]; !ok {
+		return ErrorBookNotFound
+	}
+	delete(s.Data, id)
+	return nil
 }
